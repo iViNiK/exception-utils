@@ -1,0 +1,70 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "http://repository.jboss.org/nexus/content/groups/public/"
+        }
+    }
+    dependencies {
+        classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
+    }
+}
+
+plugins {
+	id 'java'
+}
+
+ext {
+	springBootVersion = '2.1.10.RELEASE'
+	springCloudVersion = 'Finchley.RELEASE'
+	springVersion = '5.1.11.RELEASE'
+	logbackVersion = '1.2.3'
+	aspectjVersion = '1.8.13'
+	servletApiVersion = '3.1.0'
+	jacksonVersion = '2.9.5'
+	cxfVersion = '3.2.4'
+	noNilsWsdl2javaVersion = '0.10'
+	
+}
+
+apply plugin: 'maven-publish'
+repositories{
+	mavenCentral()
+}
+
+group = 'it.vinicioflamini.sharedlib'
+version = '1.0.0-RELEASE'
+sourceCompatibility = 1.11
+
+dependencies {
+    // Load bill of materials (BOM) for Spring Boot.
+    // The dependencies in the BOM will be
+    // dependency constraints in our build.
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:$rootProject.ext.springBootVersion"))
+    implementation "org.springframework.boot:spring-boot-starter-web"
+	implementation('org.apache.commons:commons-lang3:3.6')
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.1.12.RELEASE'
+}
+
+tasks.withType(JavaCompile) {
+    options.incremental = false
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+        }
+    }
+    
+    repositories {
+    	mavenLocal()
+    }
+}
+
